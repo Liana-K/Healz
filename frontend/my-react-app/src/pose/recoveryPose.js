@@ -1,31 +1,35 @@
-// recoveryPose.js
 import { Pose } from "@mediapipe/pose";
 import { Camera } from "@mediapipe/camera_utils";
 
 export function startRecoveryTest(onComplete) {
-  // Create video element for webcam
+  const container = document.getElementById("camera-container");
+
+  if (!container) {
+    console.error("camera-container not found!");
+    return;
+  }
+
+  container.innerHTML = "";
+
+  //creates a video
   const videoElement = document.createElement("video");
   videoElement.autoplay = true;
   videoElement.playsInline = true;
+  videoElement.width = 640;
+  videoElement.height = 480;
 
-  // Create canvas to draw video + landmarks
+  //creates a canvas
   const canvasElement = document.createElement("canvas");
-  const canvasCtx = canvasElement.getContext("2d");
-
-  //defining camera size
   canvasElement.width = 640;
   canvasElement.height = 480;
-  
-  const container = document.getElementById("camera-container");
-  container.innerHTML("");
+  const canvasCtx = canvasElement.getContext("2d");
+
   container.appendChild(videoElement);
   container.appendChild(canvasElement);
 
-  // Variables to track max angle and test state
   let maxAngle = 0;
   let testing = true;
 
-  // Helper function: calculate angle between 3 points
   function calculateAngle(a, b, c) {
     const radians =
       Math.atan2(c.y - b.y, c.x - b.x) -
@@ -35,7 +39,6 @@ export function startRecoveryTest(onComplete) {
     return angle;
   }
 
-  // Initialize MediaPipe Pose
   const pose = new Pose({
     locateFile: (file) =>
       `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
@@ -48,44 +51,28 @@ export function startRecoveryTest(onComplete) {
     minTrackingConfidence: 0.5,
   });
 
-  // When pose results are ready
   pose.onResults((results) => {
     if (!testing) return;
 
-    // Draw the video frame
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.clearRect(0, 0, 640, 480);
+    canvasCtx.drawImage(results.image, 0, 0, 640, 480);
 
-    // If landmarks detected, calculate knee angle
     if (results.poseLandmarks) {
-      const hip = results.poseLandmarks[23];   // left hip
-      const knee = results.poseLandmarks[25];  // left knee
-      const ankle = results.poseLandmarks[27]; // left ankle
+      const hip = results.poseLandmarks[23];
+      const knee = results.poseLandmarks[25];
+      const ankle = results.poseLandmarks[27];
 
-      
-    if (!hip || !knee || !ankle) return;
+      if (hip && knee && ankle) {
+        const angle = calculateAngle(hip, knee, ankle);
+        maxAngle = Math.max(maxAngle, angle);
 
-      const angle = calculateAngle(hip, knee, ankle);
-
-      if (angle > maxAngle) {
-        maxAngle = angle;
+        canvasCtx.fillStyle = "red";
+        canvasCtx.font = "20px Arial";
+        canvasCtx.fillText(`Knee Angle: ${angle.toFixed(1)}°`, 20, 40);
       }
-
-      onUpdate?.({
-        currentAngle: angle,
-        maxAngle
-
-      })
-
-      // // Optional: show current angle on canvas
-      canvasCtx.fillStyle = "red";
-      canvasCtx.font = "20px Arial";
-      canvasCtx.fillText(`Angle: ${angle.toFixed(1)}°`, 10, 30);
-      canvasCtx.fillText(`Max: ${maxAngle.toFixed(1)}°`, 10, 60);
     }
   });
 
-  // Setup camera to send frames to MediaPipe
   const camera = new Camera(videoElement, {
     onFrame: async () => {
       await pose.send({ image: videoElement });
@@ -94,21 +81,15 @@ export function startRecoveryTest(onComplete) {
     height: 480,
   });
 
-
-  //camera.start();
-  //gives an error if the user doesn't provide access to the camera
   camera.start().catch(err => {
-  console.error("Camera failed to start:", err);
+    console.error("Camera failed:", err);
+    alert("Camera permission blocked — allow it in browser");
   });
 
-
-  // Stop test after 8 seconds and return max angle
   setTimeout(() => {
     testing = false;
-    onComplete(maxAngle);  // sends max ROM to caller
-    videoElement.remove();
-    canvasElement.remove();
+    camera.stop();
+    container.innerHTML = "";
+    onComplete(maxAngle);
   }, 8000);
 }
-
-  

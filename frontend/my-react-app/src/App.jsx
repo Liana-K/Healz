@@ -23,7 +23,7 @@ export default function App() {
 
       <div
         id="camera-container"
-        style={{ display: "inline-block", border: "2px solid black" }}
+        style={{ width: "640px", margin: "auto" }}
       ></div>
 
       <br />
