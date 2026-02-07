@@ -24,7 +24,8 @@ export function startRecoveryTest(onComplete) {
   canvasElement.height = 480;
   const canvasCtx = canvasElement.getContext("2d");
 
-  container.appendChild(videoElement);
+  //container.appendChild(videoElement);
+  videoElement.style.display = "none";
   container.appendChild(canvasElement);
 
   let maxAngle = 0;
