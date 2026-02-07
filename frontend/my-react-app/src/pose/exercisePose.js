@@ -21,8 +21,14 @@ export function startExerciseSession(exercise, onUpdate, onComplete) {
   const ctx = canvas.getContext("2d");
 
   const container = document.getElementById("camera-container");
+
+  if (!container) {
+    throw new Error("camera-container not found");
+  }
+
   container.appendChild(video);
   container.appendChild(canvas);
+
 
   canvas.width = 640;
   canvas.height = 480;
@@ -35,6 +41,7 @@ export function startExerciseSession(exercise, onUpdate, onComplete) {
 
   let repCount = 0;
   let inTargetZone = false;
+  let sessionEnded = false;
 
   // -------------------------
   // Helper: angle calculation
@@ -68,6 +75,7 @@ export function startExerciseSession(exercise, onUpdate, onComplete) {
   // Pose results (MAIN LOOP)
   // -------------------------
   pose.onResults((results) => {
+    if (sessionEnded) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
 
@@ -98,13 +106,14 @@ export function startExerciseSession(exercise, onUpdate, onComplete) {
     // -------------------------
     // Speed
     // -------------------------
-    const now = Date.now();
-    const timeDiff = (now - lastTime) / 1000;
+  const now = Date.now();
+  const timeDiff = (now - lastTime) / 1000;
 
-    let speed = 0;
-    if (lastAngle !== null) {
-      speed = Math.abs(angle - lastAngle) / timeDiff;
-    }
+  let speed = 0;
+  if (lastAngle !== null && timeDiff > 0) {
+    speed = Math.abs(angle - lastAngle) / timeDiff;
+  }
+
 
     lastAngle = angle;
     lastTime = now;
@@ -123,14 +132,17 @@ export function startExerciseSession(exercise, onUpdate, onComplete) {
     // -------------------------
     // Rep counting logic
     // -------------------------
-    if (angleOk && speedOk && !inTargetZone) {
+  if (angleOk && speedOk) {
+    if (!inTargetZone) {
       inTargetZone = true;
     }
-
-    if (!angleOk && inTargetZone) {
+  } else {
+    if (inTargetZone && angle < exercise.jointAngle.angleRange.min) {
       repCount += 1;
       inTargetZone = false;
     }
+  }
+
 
     // -------------------------
     // Feedback text
@@ -169,14 +181,13 @@ export function startExerciseSession(exercise, onUpdate, onComplete) {
     // -------------------------
     // End condition
     // -------------------------
-    if (repCount >= exercise.reps) {
+    if (!sessionEnded && repCount >= exercise.reps) {
+      sessionEnded = true;
       cleanup();
-      onComplete({
-        reps: repCount,
-        success: true,
-      });
+      onComplete({ reps: repCount, success: true });
     }
-  });
+  }); //closes pose.onresults
+
 
   // -------------------------
   // Camera start
@@ -195,10 +206,12 @@ export function startExerciseSession(exercise, onUpdate, onComplete) {
   // Cleanup
   // -------------------------
   function cleanup() {
-    camera.stop();
+    try {
+      camera.stop();
+    } 
+    catch {}
     video.remove();
     canvas.remove();
-    let repCount = 0;
-
   }
 }
+
