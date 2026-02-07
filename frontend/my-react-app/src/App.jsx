@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { startRecoveryTest } from "./pose/recoveryPose";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [currentAngle, setCurrentAngle] = useState(null);
+  const [maxAngle, setMaxAngle] = useState(null);
+
+  const startTest = () => {
+    startRecoveryTest(
+      (live) => {
+        setCurrentAngle(live.currentAngle);
+        setMaxAngle(live.maxAngle);
+      },
+      (finalMax) => {
+        alert(`Final Max Knee Angle: ${finalMax.toFixed(1)}°`);
+      }
+    );
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div style={{ textAlign: "center", marginTop: "20px" }}>
+      <h1>Knee Recovery Test</h1>
 
-export default App
+      <div
+        id="camera-container"
+        style={{ display: "inline-block", border: "2px solid black" }}
+      ></div>
+
+      <br />
+
+      <button onClick={startTest} style={{ marginTop: "15px" }}>
+        Start Test
+      </button>
+
+      {currentAngle && <p>Current Angle: {currentAngle.toFixed(1)}°</p>}
+      {maxAngle && <p>Max Angle: {maxAngle.toFixed(1)}°</p>}
+    </div>
+  );
+}

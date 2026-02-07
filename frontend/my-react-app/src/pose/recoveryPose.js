@@ -2,13 +2,6 @@
 import { Pose } from "@mediapipe/pose";
 import { Camera } from "@mediapipe/camera_utils";
 
-/**
- * Starts a recovery range-of-motion test
- * @param {Object} config - which joint to test
- * @param {Function} onUpdate - live angle updates
- * @param {Function} onComplete - final max ROM result
- */
-
 export function startRecoveryTest(onComplete) {
   // Create video element for webcam
   const videoElement = document.createElement("video");
@@ -18,20 +11,15 @@ export function startRecoveryTest(onComplete) {
   // Create canvas to draw video + landmarks
   const canvasElement = document.createElement("canvas");
   const canvasCtx = canvasElement.getContext("2d");
-  
-  const container = document.getElementById("camera-container");
-  container.appendChild(video);
-  container.appendChild(canvas);
-
 
   //defining camera size
   canvasElement.width = 640;
   canvasElement.height = 480;
-
-
-  // Add video + canvas to page (assume a container exists)
-  document.getElementById("camera-container").appendChild(videoElement);
-  document.getElementById("camera-container").appendChild(canvasElement);
+  
+  const container = document.getElementById("camera-container");
+  container.innerHTML("");
+  container.appendChild(videoElement);
+  container.appendChild(canvasElement);
 
   // Variables to track max angle and test state
   let maxAngle = 0;
@@ -75,7 +63,7 @@ export function startRecoveryTest(onComplete) {
       const ankle = results.poseLandmarks[27]; // left ankle
 
       
-    //if (!hip || !knee || !ankle) return;
+    if (!hip || !knee || !ankle) return;
 
       const angle = calculateAngle(hip, knee, ankle);
 
@@ -83,17 +71,19 @@ export function startRecoveryTest(onComplete) {
         maxAngle = angle;
       }
 
-      // Optional: show current angle on canvas
+      onUpdate?.({
+        currentAngle: angle,
+        maxAngle
+
+      })
+
+      // // Optional: show current angle on canvas
       canvasCtx.fillStyle = "red";
       canvasCtx.font = "20px Arial";
-      canvasCtx.fillText(`Current ROM: ${angle.toFixed(1)}°`, 10, 30);
+      canvasCtx.fillText(`Angle: ${angle.toFixed(1)}°`, 10, 30);
+      canvasCtx.fillText(`Max: ${maxAngle.toFixed(1)}°`, 10, 60);
     }
   });
-
-    onUpdate({
-      currentAngle: angle,
-      maxAngle,
-    })
 
   // Setup camera to send frames to MediaPipe
   const camera = new Camera(videoElement, {
@@ -103,6 +93,8 @@ export function startRecoveryTest(onComplete) {
     width: 640,
     height: 480,
   });
+
+
   //camera.start();
   //gives an error if the user doesn't provide access to the camera
   camera.start().catch(err => {
@@ -117,12 +109,6 @@ export function startRecoveryTest(onComplete) {
     videoElement.remove();
     canvasElement.remove();
   }, 8000);
-
-  function cleanup() {
-    camera.stop();
-    video.remove();
-    canvas.remove();
-  }
 }
 
   
