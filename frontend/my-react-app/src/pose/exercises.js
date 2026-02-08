@@ -21,6 +21,13 @@ function getWeekFromAngle(angle) {
   return 3;
 }
 
+const recoveryAngles = [];
+
+function saveRecoveryTest(angle) {
+  recoveryAngles.push(angle);
+  return recoveryAngles.length - 1; // this is the week number
+}
+
 
 function getExercises(week) {
   const weekCount = Math.min(week, 3); // cap to max week 3
