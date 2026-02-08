@@ -1,4 +1,4 @@
-import logo from "./assets/JointScope.png";
+import logo from "../assets/JointScope.png";
 
 export default function Logo({ size = 180 }) {
   return (
@@ -8,4 +8,4 @@ export default function Logo({ size = 180 }) {
       style={{ width: size }}
     />
   );
-}
+} 

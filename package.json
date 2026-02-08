@@ -8,5 +8,8 @@
     "lint": "cd frontend/my-react-app && npm run lint",
     "preview": "cd frontend/my-react-app && npm run preview",
     "install-all": "cd frontend/my-react-app && npm install"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.13.0"
   }
 }

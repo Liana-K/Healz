@@ -1,23 +1,22 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Logo from "../Components/Logo";
 
-import Splash from "./Splash";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Record from "./pages/Record";
-import History from "./pages/History";
-import RecoveryTest from "./RecoveryTest";
+export default function Dashboard() {
+  const navigate = useNavigate();
 
-export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Splash />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/record" element={<Record />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/recovery-test" element={<RecoveryTest />} />
-      </Routes>
-    </Router>
+    <div className="page logo-page">
+      <Logo size={120} />
+
+      <div className="dashboard-actions">
+        <button onClick={() => navigate("/record")}>
+          Record Recovery Test
+        </button>
+
+        <button onClick={() => navigate("/history")}>
+          View History
+        </button>
+      </div>
+    </div>
   );
 }
