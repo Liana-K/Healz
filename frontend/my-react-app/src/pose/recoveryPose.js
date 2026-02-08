@@ -54,6 +54,10 @@ export function startRecoveryTest(onComplete) {
   });
 
   pose.onResults((results) => {
+    let displayedAngle = 0;
+    let lastUpdateTime = 0;
+    const UPDATE_INTERVAL = 10000; // 1000ms = 1 second
+
     if (!testing) return;
 
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -66,11 +70,30 @@ export function startRecoveryTest(onComplete) {
 
       if (hip && knee && ankle) {
         const angle = calculateAngle(hip, knee, ankle);
-        maxAngle = Math.max(maxAngle, angle);
+      maxAngle = Math.max(maxAngle, angle);
 
+const now = Date.now();
+
+// Only update once every second
+if (now - lastUpdateTime > UPDATE_INTERVAL) {
+  displayedAngle = angle;
+  lastUpdateTime = now;
+}
+
+canvasCtx.fillStyle = "red";
+canvasCtx.font = "20px Arial";
+canvasCtx.fillText(
+  `Knee Angle: ${displayedAngle.toFixed(1)}°`,
+  20,
+  40
+);
+
+<<<<<<< Updated upstream
         canvasCtx.fillStyle = "white";
         canvasCtx.font = "40px Arial";
         canvasCtx.fillText(`Knee Angle: ${angle.toFixed(1)}°`, 20, 40);
+=======
+>>>>>>> Stashed changes
       }
     }
   });

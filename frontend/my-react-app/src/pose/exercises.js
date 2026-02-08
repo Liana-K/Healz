@@ -16,8 +16,8 @@ const exercisesByWeek = {
 
 
 function getWeekFromAngle(angle) {
-  if (angle < 30) return 1;
-  if (angle < 60) return 2;
+  if (angle < 20) return 1;
+  if (angle < 40) return 2;
   return 3;
 }
 
