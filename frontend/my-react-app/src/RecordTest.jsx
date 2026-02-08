@@ -10,6 +10,11 @@ export default function RecoveryTest() {
   const [currentAngle, setCurrentAngle] = useState(null);
   const [maxAngle, setMaxAngle] = useState(null);
 
+  const [view, setView] = useState("dashboard");
+  if (view === "exercise") {
+  return <Exercise />; //renders Exercise component
+}
+
   const handleStartTest = () => {
     startRecoveryTest(
       cameraContainerRef.current,
@@ -67,7 +72,8 @@ export default function RecoveryTest() {
             Back to Dashboard
           </button>
 
-          <button onClick={() => (window.location.href = "/exercise")}>
+            
+          <button onClick={() => setView("exercise")}>
             View Exercises
           </button>
         </div>
