@@ -7,33 +7,21 @@ export default function Splash() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setTimeout(() => navigate("/login"), 2200);
+    const timer = setTimeout(() => {
+      navigate("/login");
+    }, 2500);
+
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   return (
     <motion.div
-      initial={{
-        x: 0,
-        y: 0,
-        scale: 1
-      }}
-      animate={{
-        x: "-42vw",
-        y: "-42vh",
-        scale: 0.55
-      }}
-      transition={{
-        duration: 1.6,
-        ease: "easeInOut"
-      }}
-      style={{
-        height: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
+      className="page logo-page"
+      initial={{ scale: 1, opacity: 1 }}
+      animate={{ scale: 0.45, x: "-42vw", y: "-42vh" }}
+      transition={{ duration: 1.8, ease: "easeInOut" }}
     >
-      <Logo size={220} />
+      <Logo size={200} />
     </motion.div>
   );
 }
