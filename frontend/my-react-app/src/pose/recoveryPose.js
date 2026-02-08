@@ -15,13 +15,13 @@ export function startRecoveryTest(onComplete) {
   const videoElement = document.createElement("video");
   videoElement.autoplay = true;
   videoElement.playsInline = true;
-  videoElement.width = 640;
-  videoElement.height = 480;
+  videoElement.width = 1280;
+  videoElement.height = 680;
 
   //creates a canvas
   const canvasElement = document.createElement("canvas");
-  canvasElement.width = 640;
-  canvasElement.height = 480;
+  canvasElement.width = videoElement.width;
+  canvasElement.height = videoElement.height;
   const canvasCtx = canvasElement.getContext("2d");
 
   //container.appendChild(videoElement);
@@ -36,7 +36,8 @@ export function startRecoveryTest(onComplete) {
       Math.atan2(c.y - b.y, c.x - b.x) -
       Math.atan2(a.y - b.y, a.x - b.x);
     let angle = Math.abs(radians * (180 / Math.PI));
-    if (angle > 180) angle = 360 - angle;
+    //if (angle > 180) 
+    angle = 180 - (360 - angle);
     return angle;
   }
 
@@ -55,8 +56,8 @@ export function startRecoveryTest(onComplete) {
   pose.onResults((results) => {
     if (!testing) return;
 
-    canvasCtx.clearRect(0, 0, 640, 480);
-    canvasCtx.drawImage(results.image, 0, 0, 640, 480);
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
     if (results.poseLandmarks) {
       const hip = results.poseLandmarks[23];
@@ -67,8 +68,8 @@ export function startRecoveryTest(onComplete) {
         const angle = calculateAngle(hip, knee, ankle);
         maxAngle = Math.max(maxAngle, angle);
 
-        canvasCtx.fillStyle = "red";
-        canvasCtx.font = "20px Arial";
+        canvasCtx.fillStyle = "white";
+        canvasCtx.font = "40px Arial";
         canvasCtx.fillText(`Knee Angle: ${angle.toFixed(1)}°`, 20, 40);
       }
     }
@@ -78,8 +79,8 @@ export function startRecoveryTest(onComplete) {
     onFrame: async () => {
       await pose.send({ image: videoElement });
     },
-    width: 640,
-    height: 480,
+    width: canvasElement.width,
+    height: canvasElement.height,
   });
 
   camera.start().catch(err => {
