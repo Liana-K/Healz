@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState } from "react";
 
 import Splash from "./pages/Splash";
 import Login from "./pages/Login";
@@ -7,15 +7,27 @@ import Record from "./pages/Record";
 import History from "./pages/History";
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Splash />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/record" element={<Record />} />
-        <Route path="/history" element={<History />} />
-      </Routes>
-    </BrowserRouter>
-  );
+  const [page, setPage] = useState("splash");
+
+  if (page === "splash") {
+    return <Splash goTo={setPage} />;
+  }
+
+  if (page === "login") {
+    return <Login goTo={setPage} />;
+  }
+
+  if (page === "dashboard") {
+    return <Dashboard goTo={setPage} />;
+  }
+
+  if (page === "record") {
+    return <Record goTo={setPage} />;
+  }
+
+  if (page === "history") {
+    return <History goTo={setPage} />;
+  }
+
+  return null;
 }

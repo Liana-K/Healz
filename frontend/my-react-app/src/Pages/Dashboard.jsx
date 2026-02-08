@@ -1,22 +1,17 @@
-import { useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 
-export default function Dashboard() {
-  const navigate = useNavigate();
-
+export default function Dashboard({ goTo }) {
   return (
     <div className="page logo-page">
       <Logo size={120} />
 
-      <div className="dashboard-actions">
-        <button onClick={() => navigate("/record")}>
-          Record Recovery Test
-        </button>
+      <button onClick={() => goTo("record")}>
+        Record Recovery Test
+      </button>
 
-        <button onClick={() => navigate("/history")}>
-          View History
-        </button>
-      </div>
+      <button onClick={() => goTo("history")}>
+        View History
+      </button>
     </div>
   );
 }
