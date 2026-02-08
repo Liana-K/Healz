@@ -20,9 +20,11 @@ export function startRecoveryTest(onComplete) {
 
   //creates a canvas
   const canvasElement = document.createElement("canvas");
+  event.target.parentNode.appendChild(canvas);
   canvasElement.width = videoElement.width;
   canvasElement.height = videoElement.height;
   const canvasCtx = canvasElement.getContext("2d");
+  const drawingUtils = new drawingUtils(canvasCtx);
 
   //container.appendChild(videoElement);
   videoElement.style.display = "none";
@@ -58,6 +60,11 @@ export function startRecoveryTest(onComplete) {
 
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+    for (const landmark of results.poseLandmarks || []) {
+      drawingUtils.drawLandmark(landmark, { color: "red", radius: (data) => drawingUtils.lerp(data.from.z, -0.15, 0.1) * 10 });
+    drawingUtils.drawConnectors(results.poseLandmarks, Pose.POSE_CONNECTIONS, { color: "white", lineWidth: 4 });
+    }
 
     if (results.poseLandmarks) {
       const hip = results.poseLandmarks[23];
