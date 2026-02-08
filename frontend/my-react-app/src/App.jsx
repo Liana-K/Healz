@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Splash from "./pages/Splash";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Record from "./pages/Record";
-import History from "./pages/History";
+import Splash from "./pages/Splash.jsx";
+import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Record from "./pages/Record.jsx";
+import History from "./pages/History.jsx";
 
 export default function App() {
   return (
